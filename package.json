@@ -1,0 +1,17 @@
+{
+  "name": "prometheus-service-scanner",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "docker-compose up -d --build"
+  },
+  "author": "Daniel Vestøl",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "needle": "^2.4.0",
+    "ping": "^0.2.2",
+    "tiny-async-pool": "^1.0.4"
+  }
+}

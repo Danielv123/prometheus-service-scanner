@@ -1,0 +1,13 @@
+version: "3.6"
+services:
+  prometheus-service-scanner:
+    container_name: prometheus-service-scanner
+    build:
+      context: .
+      dockerfile: dockerfile
+    image: prometheus-service-scanner
+    volumes:
+      - /mnt/e/prometheus:/data
+    restart: unless-stopped
+    ports:
+      - '8080:8080'
