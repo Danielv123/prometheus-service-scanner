@@ -5,9 +5,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: prometheus-service-scanner
     volumes:
       - /mnt/e/prometheus:/data
     restart: unless-stopped
     ports:
       - '9101:3000'
+    image: "danielvestol/prometheus-service-scanner"
