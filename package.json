@@ -5,7 +5,8 @@
   "main": "./src/index.js",
   "scripts": {
     "test": "cd src && node index.js",
-    "deploy": "docker-compose up -d --build"
+    "deploy": "docker-compose up -d --build",
+    "logs": "docker-compose logs --follow"
   },
   "author": "Daniel Vestøl",
   "license": "UNLICENSED",

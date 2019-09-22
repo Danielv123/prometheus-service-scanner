@@ -50,35 +50,43 @@
         </div>
         <div id="settings">
             <!--
-                Parallell IPs to scan
-                Parallell ports to scan per IP
+                Parallel IPs to scan
+                Parallel ports to scan per IP
                 Time between scans
                 Ping timeout
             -->
             <h2>Settings</h2>
             <div class="setting">
-                <p class="name">Parallell IPs to scan</p>
-                <input type="number" step="1">
+                <p class="name">Parallel IPs to scan</p>
+                <input type="number" step="1" id="settingParallelIPs">
             </div>
             <div class="setting">
-                <p class="name">Parallell ports to scan per IP</p>
-                <input type="number" step="1">
+                <p class="name">Parallel ports to scan per IP</p>
+                <input type="number" step="1" id="settingParallelPorts">
             </div>
             <div class="setting">
                 <p class="name">Port range max</p>
-                <input type="number" step="1">
+                <input type="number" step="1" id="settingMaxPort">
             </div>
             <div class="setting">
                 <p class="name">Port range min</p>
-                <input type="number" step="1">
+                <input type="number" step="1" id="settingMinPort">
             </div>
             <div class="setting">
                 <p class="name">Time between scans</p>
-                <input type="number" step="1">
+                <input type="number" step="1" id="settingScanInterval">
             </div>
             <div class="setting">
                 <p class="name">Ping timeout</p>
-                <input type="number" step="1">
+                <input type="number" step="1" id="settingPingTimeout">
+            </div>
+            <div class="setting">
+                <p class="name">Subnet</p>
+                <input type="text" id="settingSubnet">
+            </div>
+            <div class="setting">
+                <p class="name">Netmask</p>
+                <input type="text" step="1" id="settingNetmask">
             </div>
         </div>
     </div>

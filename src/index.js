@@ -6,6 +6,7 @@ const express = require("express")
 
 const app = express()
 
+app.use(express.json());
 app.use(express.static("./static"))
 
 app.listen(3000, () => {
@@ -21,6 +22,21 @@ app.get("/api/exporters.json", (req, res) => {
 app.get("/api/info.json", (req, res) => {
     res.send(info)
 })
+app.get("/api/settings.json", (req, res) => {
+    res.send(settings)
+})
+app.post("/api/setSetting", (req, res) => {
+    let token = req.body.token // Do something about this some time in the future
+    if(settings[req.body.setting] !== undefined){
+        settings[req.body.setting] = req.body.value
+        console.log(`Set setting ${req.body.setting} to ${req.body.value}`)
+        res.send({
+            ok: true,
+            msg: `Successfully set setting ${req.body.setting} to ${req.body.value}`
+        })
+        saveData("prometheus-service-scanner-settings.json", settings)
+    }
+})
 
 let info = {
     last_scan_start: 0,
@@ -28,19 +44,18 @@ let info = {
     last_scan_duration: 0,
     next_scan_start: 0,
 }
-let settings = {
+let settings = loadData("prometheus-service-scanner-settings.json", {
     minPort: 1000,
     maxPort: 10000,
-    parallellIPs: 15,
-    parallellPorts: 3,
+    parallelIPs: 15,
+    parallelPorts: 3,
     scanInterval: 1000*60*60,
     pingTimeout: 500,
     subnet: "192.168.10",
     netmask: "255.255.255.0"
-}
-
-function loadData(file = "exporters.json"){
-    let exporters = []
+})
+function loadData(file = "exporters.json", placeholder = []){
+    let exporters = placeholder
     try{
         exporters = JSON.parse(fs.readFileSync("./../data/"+file))
     } catch(e){}
@@ -79,7 +94,7 @@ async function scanSubnet(subnet = "192.168.10", mask = "255.255.255.0"){
     for(let i = 1; i < 254; i++){
         hostsToScan.push(`${subnet}.${i}`)
     }
-    return asyncPool(settings.parallellIPs, hostsToScan, scanHost).then(hosts => {
+    return asyncPool(settings.parallelIPs, hostsToScan, scanHost).then(hosts => {
         console.log("Scanning finished!")
         info.last_scan_complete = Date.now()
         info.last_scan_duration = info.last_scan_complete - info.last_scan_start
@@ -105,7 +120,7 @@ async function scanHost(hostname){
                 }
                 // Quit early after 5 minutes if we take too long
                 let quitEarly = setTimeout(() => resolve([]), 300000)
-                let resultsPromise = asyncPool(settings.parallellPorts, addresses, checkAddress).then(results => {
+                let resultsPromise = asyncPool(settings.parallelPorts, addresses, checkAddress).then(results => {
                     for(result of results){
                         if(result.ok){
                             if(!exporters.includes(result.address)){
@@ -185,6 +200,7 @@ function isPrometheusFormat(data) {
 // Save stuff on exit logic
 function exitHandler(options, exitCode) {
     saveData("exporters.json", exporters)
+    saveData("prometheus-service-scanner-settings.json", settings)
     if (options.cleanup) console.log('clean');
     if (exitCode || exitCode === 0) console.log(exitCode);
     if (options.exit) process.exit();

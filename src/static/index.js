@@ -48,4 +48,60 @@ async function updateInterface(){
     // Time until next scan
     statNextScan.innerHTML = moment(info.next_scan_start).fromNow()
 }
+updateSettings()
+async function updateSettings(){
+    let settings = await fetchJSON("/api/settings.json")
+    /*
+    settings = {
+        minPort: 1000,
+        maxPort: 10000,
+        parallelIPs: 15,
+        parallelPorts: 3,
+        scanInterval: 1000*60*60,
+        pingTimeout: 500,
+        subnet: "192.168.10",
+        netmask: "255.255.255.0"
+    }//*/
+    settingParallelIPs.value = settings.parallelIPs
+    settingParallelPorts.value = settings.parallelPorts
+    settingMaxPort.value = settings.maxPort
+    settingMinPort.value = settings.minPort
+    settingScanInterval.value = settings.scanInterval
+    settingPingTimeout.value = settings.pingTimeout
+    settingSubnet.value = settings.subnet
+    settingNetmask.value = settings.netmask
+}
 
+let idToSetting = {
+    settingParallelIPs: "parallelIPs",
+    settingParallelPorts: "parallelPorts",
+    settingMaxPort: "maxPort",
+    settingMinPort: "minPort",
+    settingScanInterval: "scanInterval",
+    settingPingTimeout: "pingTimeout",
+    settingSubnet: "subnet",
+    settingNetmask: "netmask"
+}
+for(let key in idToSetting){
+    document.querySelector("#"+key).onchange = async e => {
+        let newValue = e.target.value
+        let status = await postJSON("/api/setSetting", {
+            token:"not yet implemented",
+            setting: idToSetting[key],
+            value: newValue
+        })
+        console.log(status)
+    }
+}
+async function postJSON(url, data){
+    const rawResponse = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+    const content = await rawResponse.json();
+    return content
+}
