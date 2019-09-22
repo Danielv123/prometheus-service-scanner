@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<head>
+    <title>prometheus-service-scanner dashboard</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body>
+    <div id="header">
+        <div id="header-centered">
+            <h1>prometheus-service-scanner</h1>
+            <p>By Danielv123</p><a href="https://github.com/Danielv123">Github</a>
+        </div>
+    </div>
+    <div id="content">
+        <div id="detected">
+            <h2>Detected targets</h2>
+            <ul>
+                <li>
+                    <a href="http://192.168.10.144:9090/metrics">192.168.10.144:9090/metrics</a>
+                </li>
+                <li>
+                    <a href="http://192.168.10.144:9090/metrics">192.168.10.144:9090/metrics</a>
+                </li>
+                <li>
+                    <a href="http://192.168.10.144:9090/metrics">192.168.10.144:9090/metrics</a>
+                </li>
+                <li>
+                    <a href="http://192.168.10.144:9090/metrics">192.168.10.144:9090/metrics</a>
+                </li>
+                <li>
+                    <a href="http://192.168.10.144:9090/metrics">192.168.10.144:9090/metrics</a>
+                </li>
+            </ul>
+        </div>
+        <div id="statistics">
+            <!--
+                Targets detected
+                Number of servers (often lower than targets)
+                Time since last scan
+                Duration of last scan
+                Next scan time
+            -->
+            <h2>Statistics</h2>
+            <div class="statistic">
+                <p class="name">Targets detected</p>
+                <p class="unit"></p>
+                <p class="value">12</p>
+            </div>
+            <div class="statistic">
+                <p class="name">Number of servers</p>
+                <p class="unit"></p>
+                <p class="value">3</p>
+            </div>
+            <div class="statistic">
+                <p class="name">Time since last scan</p>
+                <p class="unit">m</p>
+                <p class="value">20</p>
+            </div>
+            <div class="statistic">
+                <p class="name">Scan duration</p>
+                <p class="unit">s</p>
+                <p class="value">83</p>
+            </div>
+            <div class="statistic">
+                <p class="name">Time until next scan</p>
+                <p class="unit">m</p>
+                <p class="value">12</p>
+            </div>
+        </div>
+        <div id="settings">
+            <!--
+                Parallell IPs to scan
+                Parallell ports to scan per IP
+                Time between scans
+                Ping timeout
+            -->
+            <h2>Settings</h2>
+            <div class="setting">
+                <p class="name">Parallell IPs to scan</p>
+                <input type="number" step="1">
+            </div>
+            <div class="setting">
+                <p class="name">Parallell ports to scan per IP</p>
+                <input type="number" step="1">
+            </div>
+            <div class="setting">
+                <p class="name">Port range max</p>
+                <input type="number" step="1">
+            </div>
+            <div class="setting">
+                <p class="name">Port range min</p>
+                <input type="number" step="1">
+            </div>
+            <div class="setting">
+                <p class="name">Time between scans</p>
+                <input type="number" step="1">
+            </div>
+            <div class="setting">
+                <p class="name">Ping timeout</p>
+                <input type="number" step="1">
+            </div>
+        </div>
+    </div>
+    <div id="footer">
+        <p>Made by Danielv123 <a href="https://github.com/Danielv123"></a></p>
+    </div>
+    <script src="index.js"></script>
+</body>

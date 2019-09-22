@@ -1,0 +1,148 @@
+* {
+  margin: 0px;
+}
+#footer {
+  position:fixed;
+  bottom:0px;
+  display:none;
+}
+#header {
+  top: 0px;
+  position:fixed;
+  height: 100px;
+  box-shadow: 1px 2px 5px rgba(223,226,229,.4);
+  width: 100%;
+  z-index: 10;
+  background:white;
+  height: 90px;
+  box-sizing: border-box;
+  border-bottom: 1px solid #dfe2e5;
+}
+#header-centered {
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 14px;
+  padding-left: 10px;
+  width: 100%;
+  max-width: 1500px;
+  min-width: 900px;
+}
+#header-centered > p {
+  color: #a5a5a5;
+  display: inline;
+}
+#header-centered > a {
+  padding-left: 7px;
+  color: rgb(84, 97, 195, 0.7);
+}
+body {
+  background: #f1f5f7;
+}
+#content {
+  margin-top: 100px;
+  color: #7f8fa4;
+  background: #7f8fa4;
+  height: 100%;
+  margin: 0 auto;
+  position: relative;
+  top: 100px;
+  width: 100%;
+  max-width: 1500px;
+  min-width: 900px;
+}
+/* 3 col layout inside #content */
+#detected, #statistics, #settings {
+  width: calc(100% / 3);
+  padding: 10px;
+  float:left;
+  box-sizing: border-box;
+  /*border: 1px solid black;*/
+}
+#content > div > h2 {
+  /* Group headers */
+  color:black;
+}
+#detected ul {
+  padding: 0px;/**
+  margin: 20px;
+  border: 2px solid gray;*/
+}
+#detected li {
+  list-style-type:none;
+  display:block;
+  padding:10px;
+  border-radius: 5px;
+}
+#detected li a {
+  text-decoration:none;
+}
+li:nth-child(odd) {
+  background: #E8EFF1;
+}
+
+#statistics {
+  
+}
+.statistic {
+  box-sizing: border-box;
+  background: white;
+  margin-top: 10px;
+  height: 70px;
+  position:relative;
+  border-radius: 5px;
+}
+.statistic .name {
+  color: #545454;
+  font-size: 16pt;
+  position:absolute;
+  top: 20px;
+  left: 20px;
+}
+.statistic .value {
+  font-size: 30pt;
+  float:right;
+  position:absolute;
+  right: 50px;
+  bottom: 12px;
+}
+.statistic .unit {
+  font-size: 20pt;
+  float:right;
+  position:absolute;
+  bottom: 15px;
+  right: 45px;
+  transform: translateX(100%);
+}
+
+#settings {
+  
+}
+.setting {
+  margin-top: 10px;
+  background: white;
+  border-radius: 5px;
+  padding: 15px;
+  position:static;
+}
+.setting .name {
+  color: #545454;
+  padding-bottom: 4px;
+}
+.setting .name::after {
+  content: ":";
+}
+.setting input {
+  width: 100%;
+  border-radius: 5px;
+  font-size: 15pt;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+
+
+
+
+
+
+

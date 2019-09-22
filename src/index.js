@@ -2,6 +2,16 @@ const needle = require("needle")
 const fs = require("fs")
 const asyncPool = require("tiny-async-pool")
 const ping = require("ping")
+const express = require("express")
+
+const app = express()
+
+app.use(express.static("./static"))
+
+app.listen(3000, () => {
+    console.log("Webserver listening on port 3000")
+})
+
 
 function loadData(file = "exporters.json"){
     let exporters = []
