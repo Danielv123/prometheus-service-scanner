@@ -12,6 +12,32 @@ app.listen(3000, () => {
     console.log("Webserver listening on port 3000")
 })
 
+app.get("/api/targets.json", (req, res) => {
+    res.send(getTargets())
+})
+app.get("/api/exporters.json", (req, res) => {
+    res.send(exporters)
+})
+app.get("/api/info.json", (req, res) => {
+    res.send(info)
+})
+
+let info = {
+    last_scan_start: 0,
+    last_scan_complete: 0,
+    last_scan_duration: 0,
+    next_scan_start: 0,
+}
+let settings = {
+    minPort: 1000,
+    maxPort: 10000,
+    parallellIPs: 15,
+    parallellPorts: 3,
+    scanInterval: 1000*60*60,
+    pingTimeout: 500,
+    subnet: "192.168.10",
+    netmask: "255.255.255.0"
+}
 
 function loadData(file = "exporters.json"){
     let exporters = []
@@ -23,8 +49,8 @@ function loadData(file = "exporters.json"){
 function saveData(file = "exporters.json", data){
     fs.writeFileSync("./../data/"+file, JSON.stringify(data, null, 4))
 }
-function saveTargets(){
-    let targets = [
+function getTargets(){
+    return [
         {
             labels: {
                 job: "service-discovery"
@@ -32,35 +58,44 @@ function saveTargets(){
             targets: exporters.map(x => x.replace("http://", "").replace("/metrics",""))
         }
     ]
-    saveData("targets.json", targets)
+}
+function saveTargets(){
+    saveData("targets.json", getTargets())
 }
 let exporters = loadData()
 
 // scanHost("192.168.10.31")
  
-scanSubnet()
-setInterval(scanSubnet, 1000*60*60) // Once an hour
+info.next_scan_start = Date.now()
+scanSubnet(settings.subnet, settings.netmask)
+setInterval(() => scanSubnet(settings.subnet, settings.netmask), 1000*60*60) // Once an hour
 
+let x = 0;
 async function scanSubnet(subnet = "192.168.10", mask = "255.255.255.0"){
     console.log(`Scanning subnet ${subnet} netmast ${mask}`)
+    info.last_scan_start = Date.now()
+    info.next_scan_start = Date.now() + 1000*60*60
     let hostsToScan = []
-    for(let i = 1; i < 255; i++){
+    for(let i = 1; i < 254; i++){
         hostsToScan.push(`${subnet}.${i}`)
     }
-    return asyncPool(15, hostsToScan, scanHost).then(hosts => {
-
+    return asyncPool(settings.parallellIPs, hostsToScan, scanHost).then(hosts => {
+        console.log("Scanning finished!")
+        info.last_scan_complete = Date.now()
+        info.last_scan_duration = info.last_scan_complete - info.last_scan_start
     })
 }
 async function scanHost(hostname){
     return new Promise((resolve, reject) => {
         console.time(`Scanning host ${hostname}`)
+        let startTime = Date.now()
         ping.promise.probe(hostname, {
-            timeout: 500,
+            timeout: settings.pingTimeout,
         }).then(function (res) {
             //console.log(res)
             if(res.alive){
                 let addresses = []
-                for(let i = 1000; i < 10000/*49151*/; i++){
+                for(let i = settings.minPort; i < settings.maxPort/*49151*/; i++){
                     let address = `http://${hostname}:${i}/metrics`
                     addresses.push(address)
                     //console.log(`Scanning ${address}`)
@@ -68,7 +103,9 @@ async function scanHost(hostname){
                     //console.timeEnd("checkAddress")
                     // let status = await checkAddress(address)
                 }
-                let resultsPromise = asyncPool(2, addresses, checkAddress).then(results => {
+                // Quit early after 5 minutes if we take too long
+                let quitEarly = setTimeout(() => resolve([]), 300000)
+                let resultsPromise = asyncPool(settings.parallellPorts, addresses, checkAddress).then(results => {
                     for(result of results){
                         if(result.ok){
                             if(!exporters.includes(result.address)){
@@ -79,11 +116,13 @@ async function scanHost(hostname){
                         }
                     }
                     console.timeEnd(`Scanning host ${hostname}`)
+                    clearTimeout(quitEarly)
+                    resolve(results)
                 })
-                resolve(resultsPromise)
             } else {
                 console.timeEnd(`Scanning host ${hostname}`)
-                if(exporters.find(x => x.includes(hostname))){
+                // X: "http://192.168.10.37:9080/metrics"
+                if(exporters.find(x => x.split(":")[1].replace("//","") == hostname)){
                     console.log("Removing host "+hostname)
                     exporters = exporters.filter(x => !x.includes(hostname))
                     saveTargets()
@@ -105,11 +144,12 @@ function checkAddress(address){
         })
         .catch(err => {
             if(err.code == "ECONNREFUSED" // Host refused
+            || err.code == "ENOPROTOOPT" // Protocol not available (super weird)
             || err.code == "ECONNRESET"){ // Timeout
                 resolve({ok:false, address})
             } else {
-                console.log(address)
-                console.log(err)
+                //console.log(address)
+                //console.log(err)
                 resolve({ok:false, address})
             }
         })

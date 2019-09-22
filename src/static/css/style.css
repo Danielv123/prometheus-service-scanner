@@ -25,7 +25,6 @@
   padding-left: 10px;
   width: 100%;
   max-width: 1500px;
-  min-width: 900px;
 }
 #header-centered > p {
   color: #a5a5a5;
@@ -48,7 +47,6 @@ body {
   top: 100px;
   width: 100%;
   max-width: 1500px;
-  min-width: 900px;
 }
 /* 3 col layout inside #content */
 #detected, #statistics, #settings {
@@ -105,14 +103,6 @@ li:nth-child(odd) {
   right: 50px;
   bottom: 12px;
 }
-.statistic .unit {
-  font-size: 20pt;
-  float:right;
-  position:absolute;
-  bottom: 15px;
-  right: 45px;
-  transform: translateX(100%);
-}
 
 #settings {
   
@@ -142,7 +132,25 @@ li:nth-child(odd) {
 
 
 
-
-
-
+.statistic .value {
+  font-size: 20pt;
+  bottom: 20px;
+  right: 20px;
+}
+@media screen and (max-width: 1300px){
+  .statistic .value {
+    float: left !important;
+    left: 20px;
+    top: 50px;
+  }
+  .statistic {
+    height: 100px;
+  }
+}
+@media screen and (max-width: 750px){
+  /* Less than half a 1920 screen */
+  #detected, #statistics, #settings {
+    width: 100%;
+  }
+}
 
