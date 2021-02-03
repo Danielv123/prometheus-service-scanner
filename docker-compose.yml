@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - /mnt/e/prometheus:/data
+      - ./data:/data
     restart: unless-stopped
     ports:
       - '9101:3000'

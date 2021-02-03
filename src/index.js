@@ -47,10 +47,10 @@ let info = {
 let settings = loadData("prometheus-service-scanner-settings.json", {
     minPort: 1000,
     maxPort: 10000,
-    parallelIPs: 15,
-    parallelPorts: 3,
+    parallelIPs: 150,
+    parallelPorts: 10,
     scanInterval: 1000*60*60,
-    pingTimeout: 500,
+    pingTimeout: 200,
     subnet: "192.168.10",
     netmask: "255.255.255.0"
 })
@@ -83,13 +83,13 @@ let exporters = loadData()
  
 info.next_scan_start = Date.now()
 scanSubnet(settings.subnet, settings.netmask)
-setInterval(() => scanSubnet(settings.subnet, settings.netmask), 1000*60*60) // Once an hour
+setInterval(() => scanSubnet(settings.subnet, settings.netmask), Number(settings.scanInterval)) // Once an hour
 
 let x = 0;
 async function scanSubnet(subnet = "192.168.10", mask = "255.255.255.0"){
     console.log(`Scanning subnet ${subnet} netmast ${mask}`)
     info.last_scan_start = Date.now()
-    info.next_scan_start = Date.now() + 1000*60*60
+    info.next_scan_start = Date.now() + Number(settings.scanInterval)
     let hostsToScan = []
     for(let i = 1; i < 254; i++){
         hostsToScan.push(`${subnet}.${i}`)
@@ -102,13 +102,14 @@ async function scanSubnet(subnet = "192.168.10", mask = "255.255.255.0"){
 }
 async function scanHost(hostname){
     return new Promise((resolve, reject) => {
-        console.time(`Scanning host ${hostname}`)
         let startTime = Date.now()
         ping.promise.probe(hostname, {
-            timeout: settings.pingTimeout,
+            timeout: Number(settings.pingTimeout),
         }).then(function (res) {
             //console.log(res)
             if(res.alive){
+                console.log(`Alive host ${hostname}`)
+                console.time(`Scanning host ${hostname}`)
                 let addresses = []
                 for(let i = settings.minPort; i < settings.maxPort/*49151*/; i++){
                     let address = `http://${hostname}:${i}/metrics`
@@ -128,6 +129,10 @@ async function scanHost(hostname){
                                 console.log(`Added address to exporters: ${result.address}`)
                                 saveTargets()
                             }
+                        } else {
+                            // Remove address
+                            if(exporters.find(x => x === result.address)) console.log(`Removing address from exporters: ${result.address}`)
+                            exporters = exporters.filter(x =>  x !== result.address)
                         }
                     }
                     console.timeEnd(`Scanning host ${hostname}`)
@@ -135,7 +140,6 @@ async function scanHost(hostname){
                     resolve(results)
                 })
             } else {
-                console.timeEnd(`Scanning host ${hostname}`)
                 // X: "http://192.168.10.37:9080/metrics"
                 if(exporters.find(x => x.split(":")[1].replace("//","") == hostname)){
                     console.log("Removing host "+hostname)
@@ -180,12 +184,19 @@ function isPrometheusFormat(data) {
         // Blank lines
         if(!line.trim()) return true
         // Metrics lines (bad filter, but works)
-        if(line.split('"').length % 2 === 0
-        || ((
-            !line.includes("{")
-            || !line.includes("}")
-        ) && line.split(" ").length !== 2
-        )
+        if(
+            // No unbalanced quotation marks
+            line.split('"').length % 2 === 0
+            // Always one space if there are no brackets
+            || (
+                (
+                    !line.includes("{")
+                    || !line.includes("}")
+                ) 
+                && line.split(" ").length !== 2
+            )
+            // Contains HTML
+            || line.toLowerCase().includes("<body>")
         ){
             return false
         } 
