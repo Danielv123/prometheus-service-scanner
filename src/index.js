@@ -153,7 +153,7 @@ async function scanHost(hostname){
 }
 function checkAddress(address){
     return new Promise((resolve, reject) => {
-        needle("get", address, {timeout: 50})
+        needle("get", address, {timeout: 200})
         .then(resp => {
             if(isPrometheusFormat(resp.body)){
                 resolve({ok:true, address})
