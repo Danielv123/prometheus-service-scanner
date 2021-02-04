@@ -44,16 +44,22 @@ let info = {
     last_scan_duration: 0,
     next_scan_start: 0,
 }
-let settings = loadData("prometheus-service-scanner-settings.json", {
+let defaultSettings = {
     minPort: 1000,
     maxPort: 10000,
     parallelIPs: 150,
     parallelPorts: 10,
     scanInterval: 1000*60*60,
     pingTimeout: 200,
+    portTimeout: 200,
     subnet: "192.168.10",
     netmask: "255.255.255.0"
-})
+}
+let settings = loadData("prometheus-service-scanner-settings.json", defaultSettings)
+// Migrate new settings
+for(let key in defaultSettings){
+    if(settings[key] === undefined) settings[key] = defaultSettings[key]
+}
 function loadData(file = "exporters.json", placeholder = []){
     let exporters = placeholder
     try{
@@ -91,7 +97,7 @@ async function scanSubnet(subnet = "192.168.10", mask = "255.255.255.0"){
     info.last_scan_start = Date.now()
     info.next_scan_start = Date.now() + Number(settings.scanInterval)
     let hostsToScan = []
-    for(let i = 1; i < 254; i++){
+    for(let i = 1; i < 255; i++){
         hostsToScan.push(`${subnet}.${i}`)
     }
     return asyncPool(settings.parallelIPs, hostsToScan, scanHost).then(hosts => {
@@ -153,8 +159,11 @@ async function scanHost(hostname){
 }
 function checkAddress(address){
     return new Promise((resolve, reject) => {
-        needle("get", address, {timeout: 200})
+        needle("get", address, {
+            timeout: exporters.find(x => x === address)? 5000 : Number(settings.portTimeout) || 100}
+        )
         .then(resp => {
+            // console.log("Got response from",address)
             if(isPrometheusFormat(resp.body)){
                 resolve({ok:true, address})
             } else {
@@ -162,6 +171,7 @@ function checkAddress(address){
             }
         })
         .catch(err => {
+            // console.log(address, err.code)
             if(err.code == "ECONNREFUSED" // Host refused
             || err.code == "ENOPROTOOPT" // Protocol not available (super weird)
             || err.code == "ECONNRESET"){ // Timeout

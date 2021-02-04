@@ -59,6 +59,7 @@ async function updateSettings(){
         parallelPorts: 3,
         scanInterval: 1000*60*60,
         pingTimeout: 500,
+        portTimeout: 200,
         subnet: "192.168.10",
         netmask: "255.255.255.0"
     }//*/
@@ -68,6 +69,7 @@ async function updateSettings(){
     settingMinPort.value = settings.minPort
     settingScanInterval.value = settings.scanInterval
     settingPingTimeout.value = settings.pingTimeout
+    settingPortTimeout.value = settings.portTimeout
     settingSubnet.value = settings.subnet
     settingNetmask.value = settings.netmask
 }
@@ -79,6 +81,7 @@ let idToSetting = {
     settingMinPort: "minPort",
     settingScanInterval: "scanInterval",
     settingPingTimeout: "pingTimeout",
+    settingPortTimeout: "portTimeout",
     settingSubnet: "subnet",
     settingNetmask: "netmask"
 }
