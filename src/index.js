@@ -134,11 +134,7 @@ async function scanHost(hostname){
                 let resultsPromise = asyncPool(Number(settings.parallelPorts) || 3, addresses, checkAddress).then(results => {
                     for(result of results){
                         if(result.ok){
-                            if(!exporters.includes(result.address)){
-                                exporters.push(result.address)
-                                console.log(`Added address to exporters: ${result.address}`)
-                                saveTargets()
-                            }
+                            
                         } else {
                             // Remove address
                             if(exporters.find(x => x === result.address)) console.log(`Removing address from exporters: ${result.address}`)
@@ -169,6 +165,11 @@ function checkAddress(address){
         .then(resp => {
             // console.log("Got response from",address)
             if(isPrometheusFormat(resp.body)){
+                if(!exporters.includes(result.address)){
+                    exporters.push(result.address)
+                    console.log(`Added address to exporters: ${result.address}`)
+                    saveTargets()
+                }
                 resolve({ok:true, address})
             } else {
                 resolve({ok:false, address})
