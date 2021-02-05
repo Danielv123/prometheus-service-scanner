@@ -125,9 +125,13 @@ async function scanHost(hostname){
                     //console.timeEnd("checkAddress")
                     // let status = await checkAddress(address)
                 }
-                // Quit early after 5 minutes if we take too long
-                let quitEarly = setTimeout(() => resolve([]), 300000)
-                let resultsPromise = asyncPool(settings.parallelPorts, addresses, checkAddress).then(results => {
+                // Quit early after 15 minutes if we take too long
+                let quitEarly = setTimeout(() => {
+                    console.timeEnd(`Scanning host ${hostname}`)
+                    console.log(`Scan on ${hostname} failed on timeout`)
+                    resolve([])
+                }, 300000*3)
+                let resultsPromise = asyncPool(Number(settings.parallelPorts) || 3, addresses, checkAddress).then(results => {
                     for(result of results){
                         if(result.ok){
                             if(!exporters.includes(result.address)){
