@@ -13,7 +13,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "needle": "^2.9.1",
-    "ping": "^0.2.2",
+    "ping": "^0.4.1",
     "tiny-async-pool": "^1.0.4"
   }
 }
